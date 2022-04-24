@@ -17,13 +17,13 @@ export abstract class TwitchPage {
      * which can fail if elements are displayed on top of it (for example popup dialogs).
      * @param selector
      */
-    protected async click(selector: string) {
+    public async click(selector: string) {
         return this.#page.evaluate((_selector) => {
             document.querySelector(_selector).click();
         }, selector);
     }
 
-    protected async hasText(text: string) {
+    public async hasText(text: string) {
         try {
             await this.#page.waitForXPath(`//*[contains(text(), "${text}")]`, { timeout: 1000 });
             return true;

@@ -2,7 +2,10 @@ import puppeteer, { Page } from 'puppeteer';
 import { Watcher } from './watcher.js';
 
 (async () => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        headless: true,
+        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe"
+    });
 
     // const username = "justpetraslayer";
     // const password = "4EbJDI0uYkQxkKE0";

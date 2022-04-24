@@ -54,7 +54,12 @@ export class Watcher {
         // inject loaded cookies
         await this.#cookies.injectInto(page);
         // go on twitch
-        await page.goto("https://www.twitch.tv/nichtnilo");
+        await page.goto("https://www.twitch.tv/ryyfyy");
+        await page.evaluate(() => {
+            localStorage.setItem('mature', 'true');
+            localStorage.setItem('video-muted', '{"default":true}');
+            localStorage.setItem('video-quality', '{"default":"160p30"}');
+        });
         // see who logged in
         let new_cookies = new Cookies(await page.cookies());
         await Cookies.waitForCookies(page, 30);
@@ -63,16 +68,14 @@ export class Watcher {
         this.#streamPage = new StreamPage(page);
         await this.#streamPage.waitForLoad();
         await this.#streamPage.skipEmailVerification();
-        await this.#streamPage.setLowestStreamQuality();
-        await this.#streamPage.expandChatColumn();
 
-        // page.hover("[data-a-target=player-overlay-click-handler]");
-        
-        // const extension = await page.evaluate(() => {
-        //     return document.querySelector(".extensions-dock-card__image");
-        // });
-
-        // console.log(extension);
+        // reload and wait until all the stuff has loaded in
+        await page.reload({waitUntil: ['networkidle2', 'domcontentloaded']});
+        // hover over the video so the extension is shown
+        await page.waitForSelector("[data-a-target=player-overlay-click-handler]");
+        await page.hover("[data-a-target=player-overlay-click-handler]");
+        // click on the extension
+        await this.#streamPage.click(".extensions-dock-card__image");
     }
 
     async screenshot() {
