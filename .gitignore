@@ -1,0 +1,11 @@
+# IDE
+.vscode
+
+# node
+node_modules
+
+# build
+build
+
+# privacy
+users.txt

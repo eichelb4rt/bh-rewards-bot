@@ -1,0 +1,42 @@
+{
+  "name": "bh-rewards-bot",
+  "version": "1.0.0",
+  "description": "farms twitch rewards from brawlhalla dev streams",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "puppeteer": "^13.6.0",
+    "typescript": "^4.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.25",
+    "@types/puppeteer": "^5.4.5",
+    "nodemon": "^2.0.15",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.7.0"
+  },
+  "scripts": {
+    "test": "test",
+    "start:dev": "nodemon",
+    "build": "rimraf ./build && tsc",
+    "start": "npm run build && node build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eichelb4rt/bh-rewards-bot.git"
+  },
+  "keywords": [
+    "brawlhalla",
+    "twitch",
+    "bot",
+    "rewards",
+    "codes",
+    "farmer"
+  ],
+  "author": "eichelb4rt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eichelb4rt/bh-rewards-bot/issues"
+  },
+  "homepage": "https://github.com/eichelb4rt/bh-rewards-bot#readme"
+}
