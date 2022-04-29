@@ -56,6 +56,12 @@ export class Cookies {
         console.log('Saved cookies to ' + cookiesPath);
     }
 
+    static async clear(page: Page) {
+        // clear cookies
+        const client = await page.target().createCDPSession();
+        return client.send('Network.clearBrowserCookies');
+    }
+
     static async waitForCookies(page: Page, _timeout?: number) {
         // Maximum amount of time we should wait for the required cookies to be created. If they haven't been created within this time limit, consider the login a failure.
         const MAX_WAIT_FOR_COOKIES_SECONDS = _timeout ?? 30;

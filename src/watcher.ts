@@ -17,7 +17,6 @@ export class Watcher {
     }
 
     async login() {
-        let requireLogin = false;
         let cookiesPath = `./cookies/cookies-${this.#username}.json`;
         this.#cookies = Cookies.readFromFile(cookiesPath);
 
@@ -28,17 +27,9 @@ export class Watcher {
 
         // if the cookies are invalid or don't exist, login again
         if (!this.#cookies.exist()) {
-            requireLogin = true;
-        }
-
-        // login
-        if (requireLogin) {
             const loginPage = new LoginPage(await this.#browser.newPage());
+            // Save cookies
             this.#cookies = await loginPage.login(this.#username, this.#password);
-        }
-
-        // Save cookies
-        if (requireLogin) {
             this.#cookies.save(cookiesPath);
         }
     }
@@ -70,12 +61,14 @@ export class Watcher {
         await this.#streamPage.skipEmailVerification();
 
         // reload and wait until all the stuff has loaded in
-        await page.reload({waitUntil: ['networkidle2', 'domcontentloaded']});
+        await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
         // hover over the video so the extension is shown
         await page.waitForSelector("[data-a-target=player-overlay-click-handler]");
         await page.hover("[data-a-target=player-overlay-click-handler]");
         // click on the extension
         await this.#streamPage.click(".extensions-dock-card__image");
+        // hide video
+        await this.#streamPage.hideVideoElements();
     }
 
     async screenshot() {

@@ -1,22 +1,26 @@
-import puppeteer, { Page } from 'puppeteer';
-import { Watcher } from './watcher.js';
+import puppeteer, { Page } from "puppeteer";
+import { Users } from "./users.js";
+import { Watcher } from "./watcher.js";
 
 (async () => {
-    const browser = await puppeteer.launch({
-        headless: true,
-        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe"
-    });
+	const browser = await puppeteer.launch({
+		headless: true,
+		// executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe"
+		executablePath: "/usr/bin/google-chrome-stable"
+	});
 
-    // const username = "justpetraslayer";
-    // const password = "4EbJDI0uYkQxkKE0";
-    const username = "brawlhallasuperfan1";
-    const password = "g3ttingth33sportscolours";
+	const users = new Users();
+	for (const user of users.users) {
+		const watcher = new Watcher(browser, user.name, user.password);
+		await watcher.login();
+		await watcher.watch();
+		console.log(`${user.name} watching.`);
 
-    const watcher = new Watcher(browser, username, password);
-    await watcher.login();
-    await watcher.watch();
+		// don't want to wait for the screenshot
+		watcher.screenshot();
+	}
 
-    await watcher.screenshot();
+	while (true) { }
 
-    await browser.close();
+	await browser.close();
 })();
