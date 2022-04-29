@@ -21,16 +21,18 @@ export class Watcher {
         this.#cookies = Cookies.readFromFile(cookiesPath);
 
         // If both cookies and a username are provided and the provided username does not match the username stored in the cookies, warn the user and prefer to use the one from the cookies.
-        if (this.#cookies.exist() && this.#username != this.#cookies.getUsername()) {
-            console.log('Provided username does not match the one found in the cookies! Using the cookies to login...');
+        if (this.#cookies.exist() && this.#username.toLowerCase() != this.#cookies.getUsername().toLowerCase()) {
+            console.log(`Provided username (${this.#username}) does not match the one found in the cookies (${this.#cookies.getUsername()})! Using the cookies to login...`);
         }
 
-        // if the cookies are invalid or don't exist, login again
         if (!this.#cookies.exist()) {
+            // if the cookies are invalid or don't exist, login again and save the cookies
+            console.log("Logging in again.")
             const loginPage = new LoginPage(await this.#browser.newPage());
-            // Save cookies
             this.#cookies = await loginPage.login(this.#username, this.#password);
             this.#cookies.save(cookiesPath);
+        } else {
+            console.log("Restoring cookies from last session.");
         }
     }
 

@@ -1,0 +1,6 @@
+{
+    "os": "linux",
+    "mode": "login",
+    "debug": false,
+    "headless": true
+}

@@ -42,12 +42,11 @@ export class Cookies {
 
         if (!cookies.areValid()) {
             // Saved cookies are invalid, let's delete them
-            console.log('Saved cookies are invalid.')
+            console.log(`Saved cookies are invalid: ${cookiesPath}`);
             fs.unlinkSync(cookiesPath);
             return new Cookies(null);
         }
 
-        console.log('Restoring cookies from last session.');
         return cookies;
     }
 
