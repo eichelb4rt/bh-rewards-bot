@@ -4,6 +4,10 @@ import { Cookies } from "./cookies.js";
 import { Users } from "./users.js";
 import { Watcher } from "./watcher.js";
 
+async function sleep(ms: number) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function main() {
 	const config = readConfig('config.json');
 	const executablePath = config.os === 'linux' ? "/usr/bin/google-chrome-stable" : "C:/Program Files/Google/Chrome/Application/chrome.exe";
@@ -45,7 +49,10 @@ async function farm(browser: Browser, config: Config) {
 		if (config.debug) watcher.screenshot();
 	}
 
-	while (true) { /* keep watching */ }
+	while (true) {
+		// continue watching
+		await sleep(10000);
+	}
 }
 
 async function register(browser: Browser, config: Config) {
