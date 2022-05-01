@@ -25,9 +25,20 @@ async function main() {
 async function farm(browser: Browser, config: Config) {
 	const users = new Users();
 	for (const user of users.users) {
+		// don't start blocked users (or users that don't exist yet)
+		if (user.blocked || !user.registered) continue;
+		// login and watch
 		const watcher = new Watcher(browser, user.name, user.password);
 		await watcher.login();
 		await watcher.watch();
+		if (await watcher.isBlocked()) {
+			console.log(`Oh no! ${user.name} is blocked!`);
+			user.blocked = true;
+			users.save();
+			await watcher.stopWatching();
+			continue;
+		}
+		await watcher.clickExtension();
 		console.log(`${user.name} watching.`);
 
 		// don't want to wait for the screenshot
@@ -48,6 +59,8 @@ async function login(browser: Browser, config: Config) {
 		const cookiesPath = `./cookies/cookies-${user.name}.json`;
 		const cookies = Cookies.readFromFile(cookiesPath);
 		if (cookies.exist()) continue;
+		// don't start users that don't exist yet
+		if (!user.registered) continue;
 		// login
 		const watcher = new Watcher(browser, user.name, user.password);
 		await watcher.login();
@@ -60,6 +73,8 @@ async function login(browser: Browser, config: Config) {
 async function harvest(browser: Browser, config: Config) {
 	const users = new Users();
 	for (const user of users.users) {
+		// don't start users that don't exist yet
+		if (!user.registered) continue;
 		const watcher = new Watcher(browser, user.name, user.password);
 		await watcher.login();
 		await watcher.watch();

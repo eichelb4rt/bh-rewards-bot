@@ -99,4 +99,17 @@ export class StreamPage extends TwitchPage {
             }
         }
     }
+
+    async chatBanned(): Promise<boolean> {
+        const banned_text = await this.page.$("[data-test-selector=current-user-banned-text]");
+        return banned_text != null;
+    }
+
+    async clickExtension() {
+        // hover over the video so the extension is shown
+        await this.page.waitForSelector("[data-a-target=player-overlay-click-handler]");
+        await this.page.hover("[data-a-target=player-overlay-click-handler]");
+        // click on the extension
+        await this.click(".extensions-dock-card__image");
+    }
 }

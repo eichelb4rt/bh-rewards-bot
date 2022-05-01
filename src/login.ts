@@ -14,12 +14,6 @@ export class LoginPage extends TwitchPage {
         // clear cookies
         await Cookies.clear(this.page);
 
-        // Throw an error if the page is closed for any reason
-        const onPageClosed = () => {
-            throw new Error("Page closed!");
-        }
-        this.page.on("close", onPageClosed);
-
         // Go to login page
         await this.page.goto("https://www.twitch.tv/login");
 
@@ -38,7 +32,6 @@ export class LoginPage extends TwitchPage {
         await Cookies.waitForCookies(this.page, 0);
         const cookies = new Cookies(await this.page.cookies());
 
-        this.page.off("close", onPageClosed);
         await this.page.close();
 
         return cookies;

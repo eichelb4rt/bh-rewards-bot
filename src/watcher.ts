@@ -47,7 +47,7 @@ export class Watcher {
         // inject loaded cookies
         await this.#cookies.injectInto(page);
         // go on twitch
-        await page.goto("https://www.twitch.tv/ryyfyy");
+        await page.goto("https://www.twitch.tv/brawlhalla");
         await page.evaluate(() => {
             localStorage.setItem('mature', 'true');
             localStorage.setItem('video-muted', '{"default":true}');
@@ -64,13 +64,19 @@ export class Watcher {
 
         // reload and wait until all the stuff has loaded in
         await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
-        // hover over the video so the extension is shown
-        await page.waitForSelector("[data-a-target=player-overlay-click-handler]");
-        await page.hover("[data-a-target=player-overlay-click-handler]");
-        // click on the extension
-        await this.#streamPage.click(".extensions-dock-card__image");
-        // hide video
+    }
+
+    async isBlocked(): Promise<boolean> {
+        return this.#streamPage.chatBanned();
+    }
+
+    async clickExtension() {
+        await this.#streamPage.clickExtension();
         await this.#streamPage.hideVideoElements();
+    }
+
+    async stopWatching() {
+        await this.#streamPage.page.close();
     }
 
     async screenshot() {

@@ -3,7 +3,8 @@ import fs from 'fs';
 export interface User {
     name: string,
     password: string,
-    registered: boolean
+    registered: boolean,
+    blocked: boolean
 }
 
 export class Users {
@@ -17,6 +18,10 @@ export class Users {
         }
 
         this.#users = JSON.parse(fs.readFileSync(this.#jsonPath, 'utf-8'));
+    }
+
+    save() {
+        fs.writeFileSync(this.#jsonPath, JSON.stringify(this.#users, null, 4));
     }
 
     printAll() {
