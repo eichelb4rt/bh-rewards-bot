@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Browser, Page } from "puppeteer";
+import { Browser } from "puppeteer";
 import Cookies from "./cookies.js";
 import { LoginPage } from "./login.js";
 import { StreamPage } from "./stream.js";

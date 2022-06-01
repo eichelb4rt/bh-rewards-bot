@@ -42,4 +42,10 @@ export default class Config {
         return this.iconf.headless;
     }
     
+    /**
+     * Returns correct browser path based on selected OS.
+     */
+    public static get browserPath(): string {
+        return Config.os === 'linux' ? "/usr/bin/google-chrome-stable" : "C:/Program Files/Google/Chrome/Application/chrome.exe";
+    }
 }
