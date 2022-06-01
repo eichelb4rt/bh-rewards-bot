@@ -1,18 +1,22 @@
 import puppeteer, { Browser } from "puppeteer";
 import Config from "./config.js";
 import Cookies from "./cookies.js";
+import { ONLINE_REFRESH_INTERVAL, Scheduler } from "./schedule.js";
 import { Users } from "./users.js";
 import { Watcher } from "./watcher.js";
 
+// wait until the stream is online for a maximum of 2 hrs
+const MAX_WAITING_TIME = 2 * 60 * 60 * 1000;
+
 export interface ActionConfig {
     currentStreamEnd?: Date
+    scheduler?: Scheduler
 }
 
 export default class Action {
     private readonly browser: Browser;
     static #config: ActionConfig = {
         // this is just so that a config exists, that we can overwrite
-        currentStreamEnd: new Date()
     };
 
     constructor(browser: Browser) {
@@ -26,6 +30,9 @@ export default class Action {
     static configure(config: ActionConfig) {
         if (config.currentStreamEnd) {
             this.#config.currentStreamEnd = config.currentStreamEnd;
+        }
+        if (config.scheduler) {
+            this.#config.scheduler = config.scheduler;
         }
     }
 
@@ -63,7 +70,12 @@ export default class Action {
      * Starts Brawlhalla streams and farms for rewards (for every user).
      */
     async farm() {
-        // TODO: wait (max time) until brawlhalla is offline
+        // save the end time of the current stream
+        const streamEnd = Action.#config.currentStreamEnd;
+        // wait (max time) until brawlhalla is online
+        const success = await Action.waitUntilOnline();
+        if (!success) return;
+        // start farming
         const users = new Users();
         for (const user of users.users) {
             // don't start blocked users (or users that don't exist yet)
@@ -81,7 +93,9 @@ export default class Action {
             }
             console.log(`${user.name} is farming.`);
         }
-        // TODO: wait until the end of stream and brawlhalla is offline
+        // wait until the end of stream and brawlhalla is offline
+        await Scheduler.sleep(streamEnd.getTime() - Date.now());
+        await Action.waitUntilOffline();
     }
 
     async register() {
@@ -126,6 +140,27 @@ export default class Action {
 
             // don't want to wait for the screenshot
             if (Config.debug) watcher.screenshot();
+        }
+    }
+
+    private static async waitUntilOnline(): Promise<boolean> {
+        const scheduler = this.#config.scheduler;
+        const startWait = Date.now();
+        while (!await scheduler.isStreaming()) {
+            console.log(`${new Date()}: waiting until stream starts.`);
+            Scheduler.sleep(ONLINE_REFRESH_INTERVAL);
+            if (Date.now() - startWait > MAX_WAITING_TIME) {
+                console.log(`${new Date()}: waiting failed because stream didn't start.`);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static async waitUntilOffline() {
+        const scheduler = this.#config.scheduler;
+        while (!await scheduler.isStreaming()) {
+            Scheduler.sleep(ONLINE_REFRESH_INTERVAL);
         }
     }
 }

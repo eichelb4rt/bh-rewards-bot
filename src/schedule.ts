@@ -1,4 +1,3 @@
-import fs from 'fs';
 import fetch from 'node-fetch';
 import Auth from './auth.js';
 import 'dotenv/config'
@@ -6,7 +5,7 @@ import Action from './actions.js';
 import { Set } from 'typescript';
 
 // refresh online status every 10 minutes
-const ONLINE_REFRESH_INTERVAL = 10 * 60 * 1000;
+export const ONLINE_REFRESH_INTERVAL = 10 * 60 * 1000;
 // refresh schedule every 2 hours
 const SCHEDULE_REFRESH_INTERVAL = 2 * 60 * 60 * 1000;
 // ms in a week
@@ -136,5 +135,11 @@ export class Scheduler {
             this.#online = await isStreaming("brawlhalla");
         }
         return this.#online;
+    }
+
+    static async sleep(ms: number) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
     }
 }
