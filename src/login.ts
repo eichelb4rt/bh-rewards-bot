@@ -1,6 +1,6 @@
 "use strict";
 
-import { Cookies } from "./cookies.js";
+import Cookies from "./cookies.js";
 
 import { TwitchPage } from "./page.js";
 

@@ -1,6 +1,6 @@
 import puppeteer, { Browser, Page } from "puppeteer";
-import { Config, readConfig } from "./config.js";
-import { Cookies } from "./cookies.js";
+import Config from "./config.js";
+import Cookies from "./cookies.js";
 import { Users } from "./users.js";
 import { Watcher } from "./watcher.js";
 
@@ -9,24 +9,23 @@ async function sleep(ms: number) {
 }
 
 async function main() {
-	const config = readConfig('config.json');
-	const executablePath = config.os === 'linux' ? "/usr/bin/google-chrome-stable" : "C:/Program Files/Google/Chrome/Application/chrome.exe";
+	const executablePath = Config.os === 'linux' ? "/usr/bin/google-chrome-stable" : "C:/Program Files/Google/Chrome/Application/chrome.exe";
 	const browser = await puppeteer.launch({
-		headless: config.headless,
+		headless: Config.headless,
 		executablePath: executablePath
 	});
 
-	switch (config.mode) {
-		case 'farm': await farm(browser, config); break;
-		case 'harvest': await harvest(browser, config); break;
-		case 'register': await register(browser, config); break;
-		case 'login': await login(browser, config); break;
+	switch (Config.mode) {
+		case 'farm': await farm(browser); break;
+		case 'harvest': await harvest(browser); break;
+		case 'register': await register(browser); break;
+		case 'login': await login(browser); break;
 	}
 
 	await browser.close();
 }
 
-async function farm(browser: Browser, config: Config) {
+async function farm(browser: Browser) {
 	const users = new Users();
 	for (const user of users.users) {
 		// don't start blocked users (or users that don't exist yet)
@@ -42,24 +41,19 @@ async function farm(browser: Browser, config: Config) {
 			await watcher.stopWatching();
 			continue;
 		}
+		console.log("watching");
 		await watcher.clickExtension();
-		console.log(`${user.name} watching.`);
-
-		// don't want to wait for the screenshot
-		if (config.debug) watcher.screenshot();
-	}
-
-	while (true) {
-		// continue watching
-		await sleep(10000);
+		await watcher.clickInventory();
+		await watcher.saveInventory();
+		console.log(`${user.name} saved inventory.`);
 	}
 }
 
-async function register(browser: Browser, config: Config) {
+async function register(browser: Browser) {
 	// TODO: register
 }
 
-async function login(browser: Browser, config: Config) {
+async function login(browser: Browser) {
 	const users = new Users();
 	for (const user of users.users) {
 		// skip users where we already got the cookies
@@ -72,12 +66,12 @@ async function login(browser: Browser, config: Config) {
 		const watcher = new Watcher(browser, user.name, user.password);
 		await watcher.login();
 		// don't want to wait for the screenshot
-		if (config.debug) watcher.screenshot();
+		if (Config.debug) watcher.screenshot();
 	}
 	console.log("All users logged in.");
 }
 
-async function harvest(browser: Browser, config: Config) {
+async function harvest(browser: Browser) {
 	const users = new Users();
 	for (const user of users.users) {
 		// don't start users that don't exist yet
@@ -89,7 +83,7 @@ async function harvest(browser: Browser, config: Config) {
 		console.log(`${user.name} harvesting.`);
 
 		// don't want to wait for the screenshot
-		if (config.debug) watcher.screenshot();
+		if (Config.debug) watcher.screenshot();
 	}
 }
 

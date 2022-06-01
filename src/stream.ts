@@ -62,7 +62,7 @@ export class StreamPage extends TwitchPage {
     async getUptime() {
         const element = await this.page.$('span.live-time');
         const property = await element?.getProperty('innerText');
-        return await property?.jsonValue();
+        return property?.jsonValue();
     }
 
     async #clickSettingsButton() {

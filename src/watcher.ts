@@ -1,5 +1,6 @@
+import fs from 'fs';
 import { Browser, Page } from "puppeteer";
-import { Cookies } from "./cookies.js";
+import Cookies from "./cookies.js";
 import { LoginPage } from "./login.js";
 import { StreamPage } from "./stream.js";
 
@@ -73,6 +74,21 @@ export class Watcher {
     async clickExtension() {
         await this.#streamPage.clickExtension();
         await this.#streamPage.hideVideoElements();
+    }
+
+    async clickInventory() {
+        await this.#streamPage.page.waitForTimeout(5000);
+        // const tab = (await this.#streamPage.page.$x('//*[contains(text(), "Inventory")]'))[0];
+        // await tab.click();
+        // await this.#streamPage.page.click("#react-tabs-2");
+    }
+
+    async saveInventory() {
+        // const rewards = await this.#streamPage.page.$eval(".rewards-panel", (element) => {
+        //     return element.innerHTML
+        // });
+        const rewards = await this.#streamPage.page.evaluate(() => document.body.innerHTML);
+        fs.writeFileSync(`./inventories/inventory-${this.#username}.html`, rewards);
     }
 
     async stopWatching() {

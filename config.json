@@ -2,5 +2,5 @@
     "os": "linux",
     "mode": "farm",
     "debug": false,
-    "headless": true
+    "headless": false
 }

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { Page } from "puppeteer";
 
-export class Cookies {
+export default class Cookies {
     static readonly #requiredCookies = new Set(["auth-token", "persistent", "login"]);
 
     readonly #cookies: any;
