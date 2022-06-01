@@ -4,11 +4,29 @@ import Cookies from "./cookies.js";
 import { Users } from "./users.js";
 import { Watcher } from "./watcher.js";
 
+export interface ActionConfig {
+    currentStreamEnd?: Date
+}
+
 export default class Action {
     private readonly browser: Browser;
+    static #config: ActionConfig = {
+        // this is just so that a config exists, that we can overwrite
+        currentStreamEnd: new Date()
+    };
 
     constructor(browser: Browser) {
         this.browser = browser;
+    }
+
+    /**
+     * Configures parameters that the actions can use. E.g. the time, at which the current stream is ending.
+     * @param config An object with the config parameters, that should be overwritten.
+     */
+    static configure(config: ActionConfig) {
+        if (config.currentStreamEnd) {
+            this.#config.currentStreamEnd = config.currentStreamEnd;
+        }
     }
 
     /**
@@ -45,6 +63,7 @@ export default class Action {
      * Starts Brawlhalla streams and farms for rewards (for every user).
      */
     async farm() {
+        // TODO: wait (max time) until brawlhalla is offline
         const users = new Users();
         for (const user of users.users) {
             // don't start blocked users (or users that don't exist yet)
@@ -62,7 +81,7 @@ export default class Action {
             }
             console.log(`${user.name} is farming.`);
         }
-        // TODO: wait until the end of stream
+        // TODO: wait until the end of stream and brawlhalla is offline
     }
 
     async register() {
@@ -94,6 +113,7 @@ export default class Action {
      * Starts brawlhalla streams and harvests the codes (for all users).
      */
     async harvest() {
+        // TODO: wait (max time) until brawlhalla is offline
         const users = new Users();
         for (const user of users.users) {
             // don't start users that don't exist yet
