@@ -14,3 +14,10 @@ Config:
     "headless": true/false
 }
 ```
+
+`.env`:
+
+```text
+CLIENT_ID=<your client id>
+CLIENT_SECRET=<your client secret>
+```

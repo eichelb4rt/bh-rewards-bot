@@ -7,6 +7,9 @@ export interface User {
     blocked: boolean
 }
 
+/**
+ * Reads all users from `users.json` at creation.
+ */
 export class Users {
     readonly #jsonPath = "users.json";
     #users: User[];
@@ -20,6 +23,9 @@ export class Users {
         this.#users = JSON.parse(fs.readFileSync(this.#jsonPath, 'utf-8'));
     }
 
+    /**
+     * Saves all updated information to `users.json`.
+     */
     save() {
         fs.writeFileSync(this.#jsonPath, JSON.stringify(this.#users, null, 4));
     }

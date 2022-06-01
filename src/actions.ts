@@ -37,6 +37,7 @@ export default class Action {
             case 'harvest': await this.harvest(); break;
             case 'register': await this.register(); break;
             case 'login': await this.login(); break;
+            default: throw new Error(`"${mode}" is not a supported mode.`);
         }
     }
 
