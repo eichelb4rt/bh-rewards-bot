@@ -142,4 +142,8 @@ export class Scheduler {
             setTimeout(resolve, ms);
         });
     }
+
+    static async sleepUntil(date: number) {
+        await this.sleep(Math.max(date - Date.now(), 0));
+    }
 }

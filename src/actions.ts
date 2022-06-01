@@ -94,7 +94,7 @@ export default class Action {
             console.log(`${user.name} is farming.`);
         }
         // wait until the end of stream and brawlhalla is offline
-        await Scheduler.sleep(streamEnd.getTime() - Date.now());
+        await Scheduler.sleepUntil(streamEnd.getTime());
         await Action.waitUntilOffline();
     }
 
