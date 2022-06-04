@@ -143,7 +143,7 @@ export class Scheduler {
         });
     }
 
-    static async sleepUntil(date: number) {
-        await this.sleep(Math.max(date - Date.now(), 0));
+    static async sleepUntil(timestamp: number) {
+        await this.sleep(Math.max(timestamp - Date.now(), 0));
     }
 }

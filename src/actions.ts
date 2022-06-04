@@ -76,6 +76,7 @@ export default class Action {
         const success = await Action.waitUntilOnline();
         if (!success) return;
         // start farming
+        let n_watchers = 0;
         const users = new Users();
         for (const user of users.users) {
             // don't start blocked users (or users that don't exist yet)
@@ -92,11 +93,13 @@ export default class Action {
                     await watcher.stopWatching();
                     continue;
                 }
+                ++n_watchers;
                 console.log(`${user.name} is farming.`);
             } catch (e) {
                 console.log(`${user.name} crashed, but that's fine.`);
             }
         }
+        console.log(`${n_watchers} watchers are farming.`);
         // wait until the end of stream and brawlhalla is offline
         await Scheduler.sleepUntil(streamEnd.getTime());
         await Action.waitUntilOffline();
@@ -168,7 +171,7 @@ export default class Action {
     private static async waitUntilOffline() {
         const scheduler = this.#config.scheduler;
         while (!await scheduler.isStreaming()) {
-            Scheduler.sleep(ONLINE_REFRESH_INTERVAL);
+            await Scheduler.sleep(ONLINE_REFRESH_INTERVAL);
         }
     }
 }
