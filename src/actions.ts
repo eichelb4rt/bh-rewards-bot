@@ -80,18 +80,22 @@ export default class Action {
         for (const user of users.users) {
             // don't start blocked users (or users that don't exist yet)
             if (user.blocked || !user.registered) continue;
-            // login and watch
-            const watcher = new Watcher(this.browser, user.name, user.password);
-            await watcher.login();
-            await watcher.watch();
-            if (await watcher.isBlocked()) {
-                console.log(`Oh no! ${user.name} is blocked!`);
-                user.blocked = true;
-                users.save();
-                await watcher.stopWatching();
-                continue;
+            try {
+                // login and watch
+                const watcher = new Watcher(this.browser, user.name, user.password);
+                await watcher.login();
+                await watcher.watch();
+                if (await watcher.isBlocked()) {
+                    console.log(`Oh no! ${user.name} is blocked!`);
+                    user.blocked = true;
+                    users.save();
+                    await watcher.stopWatching();
+                    continue;
+                }
+                console.log(`${user.name} is farming.`);
+            } catch (e) {
+                console.log(`${user.name} crashed, but that's fine.`);
             }
-            console.log(`${user.name} is farming.`);
         }
         // wait until the end of stream and brawlhalla is offline
         await Scheduler.sleepUntil(streamEnd.getTime());
@@ -116,7 +120,11 @@ export default class Action {
             if (!user.registered) continue;
             // login
             const watcher = new Watcher(this.browser, user.name, user.password);
-            await watcher.login();
+            try {
+                await watcher.login();
+            } catch (e) {
+                console.log(`${user.name} crashed while trying to log in.`);
+            }
             // don't want to wait for the screenshot
             if (Config.debug) watcher.screenshot();
         }
