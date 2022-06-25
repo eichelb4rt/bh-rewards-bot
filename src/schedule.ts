@@ -3,6 +3,7 @@ import Auth from './auth.js';
 import 'dotenv/config'
 import Action from './actions.js';
 import { Set } from 'typescript';
+import Config from './config.js';
 
 // refresh online status every 10 minutes
 export const ONLINE_REFRESH_INTERVAL = 10 * 60 * 1000;
@@ -84,30 +85,35 @@ export class Scheduler {
         events = events.filter(event => new Date(event.start_time).getTime() - now < MS_IN_WEEK);
 
         // print number of events
-        console.log(`${new Date()}: Retrieved ${events.length} future events:`);
+        console.log(`${new Date()}: Retrieved ${events.length} future events. Scheduling nearest one.`);
 
-        for (const event of events) {
-            // list events
-            const start = new Date(event.start_time);
-            const end = new Date(event.end_time);
-            console.log(`- ${event.title} at ${start}`);
-            // say when it starts with up to 1 decimal place
-            console.log(`\t=> starting in ${Math.round(10 * (start.getTime() - now) / (1000 * 60 * 60 * 24)) / 10} days.`);
-            // schedule event
-            setTimeout(() => {
-                // when the time comes, the Action class is configured so that it knows when the current stream will end.
-                Action.configure({ currentStreamEnd: end });
-                // remember that we scheduled this event
-                this.#scheduled.add(start.getTime());
-                // this is async, but we don't want to wait for it
-                Action.autoExecute("farm");
-                // we can harvest "in parallel"
-                // TODO: implement harvest properly for this to work
-                // Action.autoExecute("harvest");
-            }, Math.max(start.getTime() - now, 0));
-            // remove the event from scheduled after it's over, just to clean up the set a bit
-            setTimeout(() => this.#scheduled.delete(start.getTime()), Math.max(end.getTime() - now, 0));
-        }
+        // schedule only the nearest event
+        if (events.length == 0) return;
+        const scheduled_event = events[0];
+        const start = new Date(scheduled_event.start_time);
+        const end = new Date(scheduled_event.end_time);
+        console.log(`- ${scheduled_event.title} at ${start}`);
+
+        // say when it starts
+        const distance_hours = (start.getTime() - now) / (1000 * 60 * 60);
+        const distance_days = Math.floor(distance_hours / 24);
+        const rest_hours = Math.round(10 * distance_days % 24) / 10;
+        console.log(`\t=> starting in ${distance_days} days and ${rest_hours}.`);
+
+        // schedule event
+        setTimeout(() => {
+            // when the time comes, the Action class is configured so that it knows when the current stream will end.
+            Action.configure({ currentStreamEnd: end });
+            // remember that we scheduled this event
+            this.#scheduled.add(start.getTime());
+            // this is async, but we don't want to wait for it
+            Action.autoExecute(Config.mode);
+            // we can harvest "in parallel"
+            // TODO: implement harvest properly for this to work
+            // Action.autoExecute("harvest");
+        }, Math.max(start.getTime() - now, 0));
+        // remove the event from scheduled after it's over, just to clean up the set a bit
+        setTimeout(() => this.#scheduled.delete(start.getTime()), Math.max(end.getTime() - now, 0));
     }
 
     async getEvents(): Promise<Event[]> {

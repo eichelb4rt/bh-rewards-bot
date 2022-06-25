@@ -1,7 +1,8 @@
 import fs from 'fs';
-import { Browser } from "puppeteer";
+import { Browser, Frame } from "puppeteer";
 import Cookies from "./cookies.js";
 import { LoginPage } from "./login.js";
+import { Reward } from './reward.js';
 import { StreamPage } from "./stream.js";
 
 export class Watcher {
@@ -10,6 +11,7 @@ export class Watcher {
     readonly #password: string;
     #cookies: Cookies;
     #streamPage: StreamPage;
+    #extensionFrame: Frame | null;
 
     constructor(browser: Browser, username: string, password: string) {
         this.#browser = browser;
@@ -67,20 +69,33 @@ export class Watcher {
         await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
     }
 
+    async hideVideo() {
+        await this.#streamPage.hideVideoElements();
+    }
+
     async isBlocked(): Promise<boolean> {
         return this.#streamPage.chatBanned();
     }
 
     async clickExtension() {
         await this.#streamPage.clickExtension();
-        await this.#streamPage.hideVideoElements();
+        const extension_frame = await this.#streamPage.page.$("iframe.extension-view__iframe");
+        this.#extensionFrame = await extension_frame.contentFrame();
     }
 
     async clickInventory() {
-        await this.#streamPage.page.waitForTimeout(5000);
-        // const tab = (await this.#streamPage.page.$x('//*[contains(text(), "Inventory")]'))[0];
-        // await tab.click();
-        // await this.#streamPage.page.click("#react-tabs-2");
+        if (!this.#extensionFrame) {
+            console.log("Didn't click the extension yet! Returning...");
+            return;
+        }
+        const tab = (await this.#extensionFrame.$x('//*[contains(text(), "Inventory")]'))[0];
+        await tab.click();
+        // await extension_frame.click("#react-tabs-2");
+    }
+
+    async readInventory(): Promise<Reward[]> {
+        // TODO: get rewards
+        return null;
     }
 
     async saveInventory() {

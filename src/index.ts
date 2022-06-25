@@ -1,6 +1,5 @@
 import Action from "./actions.js";
-import Config from "./config.js";
-import { isStreaming, Scheduler } from "./schedule.js";
+import { Scheduler } from "./schedule.js";
 
 async function main() {
 	const scheduler = new Scheduler();

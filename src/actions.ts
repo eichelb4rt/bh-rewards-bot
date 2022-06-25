@@ -1,6 +1,7 @@
 import puppeteer, { Browser } from "puppeteer";
 import Config from "./config.js";
 import Cookies from "./cookies.js";
+import { Rewards } from "./reward.js";
 import { ONLINE_REFRESH_INTERVAL, Scheduler } from "./schedule.js";
 import { Users } from "./users.js";
 import { Watcher } from "./watcher.js";
@@ -93,6 +94,7 @@ export default class Action {
                     await watcher.stopWatching();
                     continue;
                 }
+                await watcher.hideVideo();
                 ++n_watchers;
                 console.log(`${user.name} is farming.`);
             } catch (e) {
@@ -139,6 +141,7 @@ export default class Action {
      */
     async harvest() {
         // TODO: wait (max time) until brawlhalla is offline
+        Rewards.read();
         const users = new Users();
         for (const user of users.users) {
             // don't start users that don't exist yet
@@ -146,8 +149,13 @@ export default class Action {
             const watcher = new Watcher(this.browser, user.name, user.password);
             await watcher.login();
             await watcher.watch();
-            // TODO: harvest codes
+            // have to click before the video disappears
+            await watcher.clickExtension();
+            await watcher.hideVideo();
+            await watcher.clickInventory();
             console.log(`${user.name} harvesting.`);
+            const rewards = await watcher.readInventory();
+            Rewards.save(rewards);
 
             // don't want to wait for the screenshot
             if (Config.debug) watcher.screenshot();
