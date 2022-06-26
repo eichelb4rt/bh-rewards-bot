@@ -33,5 +33,6 @@ export class Rewards {
         }
         // save to file
         fs.writeFileSync(this.#jsonPath, JSON.stringify(this.#savedRewards, null, 4));
+        console.log(`Just saved ${rewards.length} new rewards.`);
     }
 }

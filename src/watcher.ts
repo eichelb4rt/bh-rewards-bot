@@ -95,7 +95,7 @@ export class Watcher {
 
     async readInventory(): Promise<Reward[]> {
         // TODO: get rewards
-        return null;
+        return [];
     }
 
     async saveInventory() {
