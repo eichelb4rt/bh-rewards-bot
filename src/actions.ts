@@ -44,7 +44,10 @@ export default class Action {
     static async autoExecute(mode: string = Config.mode) {
         const browser = await puppeteer.launch({
             headless: Config.headless,
-            executablePath: Config.browserPath
+            executablePath: Config.browserPath,
+            args: [
+                "--disable-web-security"
+            ]
         });
 
         const action = new Action(browser);

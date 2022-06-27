@@ -80,6 +80,12 @@ export class Watcher {
     async clickExtension() {
         await this.#streamPage.clickExtension();
         const extension_frame = await this.#streamPage.page.$("iframe.extension-view__iframe");
+        const iframe_document = await this.#streamPage.page.evaluate(el => el.contentWindow.document, extension_frame);
+        // console.log(iframe_document);
+        // const iiframe = await iframe_document.$("iframe");
+        // console.log(iiframe);
+        // TODO: somehow get rewards inside document inside iframe inside document inside iframe
+        console.log(iframe_document.constructor.name);
         this.#extensionFrame = await extension_frame.contentFrame();
     }
 
@@ -88,14 +94,27 @@ export class Watcher {
             console.log("Didn't click the extension yet! Returning...");
             return;
         }
-        const tab = (await this.#extensionFrame.$x('//*[contains(text(), "Inventory")]'))[0];
-        await tab.click();
-        // await extension_frame.click("#react-tabs-2");
+        // console.log(this.#extensionFrame);
+        // const tab = (await this.#extensionFrame.$x('//*[contains(text(), "Inventory")]'))[0];
+        // await tab.click();
+        await this.#extensionFrame.click("#react-tabs-2");
     }
 
     async readInventory(): Promise<Reward[]> {
-        // TODO: get rewards
-        return [];
+        const reward_holders = await this.#extensionFrame.$$(".rewards-reward-holder");
+        let rewards: Reward[] = []
+        for (const reward_holder of reward_holders) {
+            const reward_name_element = await reward_holder.$("rewards-reward-name");
+            const reward_name = await this.#streamPage.page.evaluate(el => el.textContent, reward_name_element);
+            const reward_code_element = await reward_holder.$("code-text");
+            const reward_code = await this.#streamPage.page.evaluate(el => el.textContent, reward_code_element);
+            rewards.push({
+                code: reward_code,
+                name: reward_name,
+                claimed: false
+            });
+        }
+        return rewards;
     }
 
     async saveInventory() {
