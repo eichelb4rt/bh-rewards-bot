@@ -46,7 +46,8 @@ export default class Action {
             headless: Config.headless,
             executablePath: Config.browserPath,
             args: [
-                "--disable-web-security"
+                "--disable-web-security",
+                "--disable-site-isolation-trials"
             ]
         });
 
@@ -147,21 +148,21 @@ export default class Action {
         Rewards.read();
         const users = new Users();
         for (const user of users.users) {
-            // don't start users that don't exist yet
-            if (!user.registered) continue;
-            const watcher = new Watcher(this.browser, user.name, user.password);
-            await watcher.login();
-            await watcher.watch();
-            // have to click before the video disappears
-            await watcher.clickExtension();
-            await watcher.hideVideo();
-            await watcher.clickInventory();
-            console.log(`${user.name} harvesting.`);
-            const rewards = await watcher.readInventory();
-            Rewards.save(rewards);
-
-            // don't want to wait for the screenshot
-            if (Config.debug) watcher.screenshot();
+            try {// don't start users that don't exist yet
+                if (!user.registered) continue;
+                const watcher = new Watcher(this.browser, user.name, user.password);
+                await watcher.login();
+                await watcher.watch();
+                // have to click before the video disappears
+                await watcher.clickExtension();
+                await watcher.hideVideo();
+                await watcher.clickInventory();
+                console.log(`${user.name} harvesting.`);
+                const rewards = await watcher.readInventory();
+                Rewards.save(rewards);
+            } catch (e) {
+                console.log(`${user.name} crashed while trying to harvest.`);
+            }
         }
     }
 
