@@ -101,12 +101,13 @@ export class Scheduler {
         if (distance_hours < 0) console.log("Event already started.");
         else console.log(`\t=> starting in ${distance_days} days and ${rest_hours} hours.`);
 
+        // remember that we scheduled this event
+        this.#scheduled.add(start.getTime());
+        
         // schedule event
         setTimeout(() => {
             // when the time comes, the Action class is configured so that it knows when the current stream will end.
             Action.configure({ currentStreamEnd: end });
-            // remember that we scheduled this event
-            this.#scheduled.add(start.getTime());
             // this is async, but we don't want to wait for it
             Action.autoExecute(Config.mode);
             // we can harvest "in parallel"
