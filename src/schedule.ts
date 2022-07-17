@@ -84,11 +84,9 @@ export class Scheduler {
         // remove events that are further in the future than a week
         events = events.filter(event => new Date(event.start_time).getTime() - now < MS_IN_WEEK);
 
-        // print number of events
-        console.log(`${new Date()}: Retrieved ${events.length} future events. Scheduling nearest one.`);
-
         // schedule only the nearest event
         if (events.length == 0) return;
+        console.log(`${new Date()}: Retrieved ${events.length} future events. Scheduling nearest one.`);
         const scheduled_event = events[0];
         const start = new Date(scheduled_event.start_time);
         const end = new Date(scheduled_event.end_time);
