@@ -97,7 +97,7 @@ export class Scheduler {
         // say when it starts
         const distance_hours = (start.getTime() - now) / (1000 * 60 * 60);
         const distance_days = Math.floor(distance_hours / 24);
-        const rest_hours = Math.round(10 * distance_days % 24) / 10;
+        const rest_hours = Math.round(10 * (distance_hours % 24)) / 10;
         if (distance_hours < 0) console.log("Event already started.");
         else console.log(`\t=> starting in ${distance_days} days and ${rest_hours} hours.`);
 

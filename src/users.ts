@@ -11,10 +11,10 @@ export interface User {
  * Reads all users from `users.json` at creation.
  */
 export class Users {
-    readonly #jsonPath = "users.json";
-    #users: User[];
+    static readonly #jsonPath = "users.json";
+    static #users: User[];
 
-    constructor() {
+    static read() {
         if (!fs.existsSync(this.#jsonPath)) {
             this.#users = [];
             return;
@@ -26,18 +26,18 @@ export class Users {
     /**
      * Saves all updated information to `users.json`.
      */
-    save() {
+    static save() {
         fs.writeFileSync(this.#jsonPath, JSON.stringify(this.#users, null, 4));
     }
 
-    printAll() {
+    static printAll() {
         for (const user of this.#users) {
             console.log(`name: ${user.name}\npassword: ${user.password}\nregistered: ${user.registered}\n`)
         }
     }
 
 
-    public get users(): User[] {
+    public static get users(): User[] {
         return this.#users;
     }
 

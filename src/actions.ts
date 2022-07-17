@@ -82,33 +82,34 @@ export default class Action {
         if (!success) return;
         // start farming
         let n_watchers = 0;
-        const users = new Users();
-        for (const user of users.users) {
-            // don't start blocked users (or users that don't exist yet)
-            if (user.blocked || !user.registered) continue;
+        const watchers = await this.login();
+        for (const watcher of watchers) {
             try {
-                // login and watch
-                const watcher = new Watcher(this.browser, user.name, user.password);
-                await watcher.login();
                 await watcher.watch();
                 if (await watcher.isBlocked()) {
-                    console.log(`Oh no! ${user.name} is blocked!`);
-                    user.blocked = true;
-                    users.save();
-                    await watcher.stopWatching();
+                    console.log(`Oh no! ${watcher.user.name} is blocked!`);
+                    watcher.user.blocked = true;
+                    Users.save();
+                    await watcher.stop();
                     continue;
                 }
                 await watcher.hideVideo();
                 ++n_watchers;
-                console.log(`${user.name} is farming.`);
+                console.log(`${watcher.user.name} is farming.`);
             } catch (e) {
-                console.log(`${user.name} crashed, but that's fine.`);
+                console.log(`${watcher.user.name} crashed, but that's fine.`);
+                await watcher.stop();
             }
         }
         console.log(`${n_watchers} watchers are farming.`);
         // wait until the end of stream and brawlhalla is offline
         await Scheduler.sleepUntil(streamEnd.getTime());
         await Action.waitUntilOffline();
+        // close pages
+        for (const watcher of watchers) {
+            await watcher.stop();
+        }
+        console.log("All watchers stopped watching.");
     }
 
     async register() {
@@ -118,26 +119,26 @@ export default class Action {
     /**
      * Logs all users into Twitch.
      */
-    async login() {
-        const users = new Users();
-        for (const user of users.users) {
-            // skip users where we already got the cookies
-            const cookiesPath = `./cookies/cookies-${user.name}.json`;
-            const cookies = Cookies.readFromFile(cookiesPath);
-            if (cookies.exist()) continue;
-            // don't start users that don't exist yet
-            if (!user.registered) continue;
+    async login(): Promise<Watcher[]> {
+        const watchers = [];
+        Users.read();
+        for (const user of Users.users) {
+            // don't start blocked users (or users that don't exist yet)
+            if (!user.registered || user.blocked) continue;
             // login
-            const watcher = new Watcher(this.browser, user.name, user.password);
+            const watcher = new Watcher(this.browser, user);
             try {
                 await watcher.login();
+                watchers.push(watcher);
             } catch (e) {
                 console.log(`${user.name} crashed while trying to log in.`);
+                await watcher.stop();
             }
             // don't want to wait for the screenshot
             if (Config.debug) watcher.screenshot();
         }
-        console.log("All users logged in.");
+        console.log(`${watchers.length} users logged in.`);
+        return watchers;
     }
 
     /**
@@ -146,23 +147,21 @@ export default class Action {
     async harvest() {
         // TODO: wait (max time) until brawlhalla is offline
         Rewards.read();
-        const users = new Users();
-        for (const user of users.users) {
-            try {// don't start users that don't exist yet
-                if (!user.registered) continue;
-                const watcher = new Watcher(this.browser, user.name, user.password);
-                await watcher.login();
+        const watchers = await this.login();
+        for (const watcher of watchers) {
+            try {
                 await watcher.watch();
                 // have to click before the video disappears
                 await watcher.clickExtension();
                 await watcher.hideVideo();
                 await watcher.clickInventory();
-                console.log(`${user.name} harvesting.`);
+                console.log(`${watcher.user.name} harvesting.`);
                 const rewards = await watcher.readInventory();
                 Rewards.save(rewards);
             } catch (e) {
-                console.log(`${user.name} crashed while trying to harvest.`);
+                console.log(`${watcher.user.name} crashed while trying to harvest.`);
             }
+            await watcher.stop();
         }
     }
 

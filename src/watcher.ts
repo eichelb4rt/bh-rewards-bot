@@ -4,39 +4,41 @@ import Cookies from "./cookies.js";
 import { LoginPage } from "./login.js";
 import { Reward } from './reward.js';
 import { StreamPage } from "./stream.js";
+import { User } from './users.js';
 
 export class Watcher {
     readonly #browser: Browser;
-    readonly #username: string;
-    readonly #password: string;
+    readonly user: User;
     #cookies: Cookies;
     #streamPage: StreamPage;
     #extensionFrame: Frame | null;
 
-    constructor(browser: Browser, username: string, password: string) {
+    constructor(browser: Browser, user: User) {
         this.#browser = browser;
-        this.#username = username;
-        this.#password = password;
+        this.user = user;
     }
 
     async login() {
-        let cookiesPath = `./cookies/cookies-${this.#username}.json`;
+        let cookiesPath = `./cookies/cookies-${this.user.name}.json`;
         this.#cookies = Cookies.readFromFile(cookiesPath);
 
         // If both cookies and a username are provided and the provided username does not match the username stored in the cookies, warn the user and prefer to use the one from the cookies.
-        if (this.#cookies.exist() && this.#username.toLowerCase() != this.#cookies.getUsername().toLowerCase()) {
-            console.log(`Provided username (${this.#username}) does not match the one found in the cookies (${this.#cookies.getUsername()})! Using the cookies to login...`);
+        if (this.#cookies.exist() && this.user.name.toLowerCase() != this.#cookies.getUsername().toLowerCase()) {
+            console.log(`Provided username (${this.user.name}) does not match the one found in the cookies (${this.#cookies.getUsername()})! Using the cookies to login...`);
         }
 
         if (!this.#cookies.exist()) {
             // if the cookies are invalid or don't exist, login again and save the cookies
             console.log("Logging in again.")
             const loginPage = new LoginPage(await this.#browser.newPage());
-            this.#cookies = await loginPage.login(this.#username, this.#password);
+            this.#cookies = await loginPage.login(this.user.name, this.user.password);
             this.#cookies.save(cookiesPath);
         } else {
             console.log("Restoring cookies from last session.");
         }
+
+        // we don't need this page anymore after we logged in and saved the cookies
+        await this.stop();
     }
 
     async watch() {
@@ -67,6 +69,11 @@ export class Watcher {
 
         // reload and wait until all the stuff has loaded in
         await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
+    }
+
+    async stop() {
+        if (this.#streamPage.page.isClosed()) return;
+        await this.#streamPage.page.close();
     }
 
     async hideVideo() {
@@ -119,17 +126,13 @@ export class Watcher {
         //     return element.innerHTML
         // });
         const rewards = await this.#streamPage.page.evaluate(() => document.body.innerHTML);
-        fs.writeFileSync(`./inventories/inventory-${this.#username}.html`, rewards);
-    }
-
-    async stopWatching() {
-        await this.#streamPage.page.close();
+        fs.writeFileSync(`./inventories/inventory-${this.user.name}.html`, rewards);
     }
 
     async screenshot() {
         await this.#streamPage.page.screenshot({
             fullPage: true,
-            path: `./screenshots/screenshot-${this.#username}.png`
+            path: `./screenshots/screenshot-${this.user.name}.png`
         });
     }
 }
