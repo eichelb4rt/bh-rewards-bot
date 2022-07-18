@@ -72,6 +72,7 @@ export class Watcher {
     }
 
     async stop() {
+        if (!this.#streamPage) return;
         if (this.#streamPage.page.isClosed()) return;
         await this.#streamPage.page.close();
     }
