@@ -1,6 +1,7 @@
 import puppeteer, { Browser } from "puppeteer";
 import Config from "./config.js";
 import Cookies from "./cookies.js";
+import ErrorLog from "./errorlog.js";
 import { Rewards } from "./reward.js";
 import { ONLINE_REFRESH_INTERVAL, Scheduler } from "./schedule.js";
 import { Users } from "./users.js";
@@ -97,7 +98,8 @@ export default class Action {
                 ++n_watchers;
                 console.log(`${watcher.user.name} is farming.`);
             } catch (e) {
-                console.log(`${watcher.user.name} crashed, but that's fine.`);
+                console.log(`${watcher.user.name} crashed.`);
+                ErrorLog.log(e, "farming", watcher);
                 await watcher.stop();
             }
         }
@@ -132,6 +134,7 @@ export default class Action {
                 watchers.push(watcher);
             } catch (e) {
                 console.log(`${user.name} crashed while trying to log in.`);
+                ErrorLog.log(e, "login", watcher);
                 await watcher.stop();
             }
             // don't want to wait for the screenshot
@@ -159,7 +162,8 @@ export default class Action {
                 const rewards = await watcher.readInventory();
                 Rewards.save(rewards);
             } catch (e) {
-                console.log(`${watcher.user.name} crashed while trying to harvest.`);
+                console.log(`${watcher.user.name} crashed.`);
+                ErrorLog.log(e, "harvesting", watcher);
             }
             await watcher.stop();
         }
