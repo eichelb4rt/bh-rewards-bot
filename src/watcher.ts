@@ -33,8 +33,6 @@ export class Watcher {
             const loginPage = new LoginPage(await this.#browser.newPage());
             this.#cookies = await loginPage.login(this.user.name, this.user.password);
             this.#cookies.save(cookiesPath);
-        } else {
-            console.log("Restoring cookies from last session.");
         }
 
         // we don't need this page anymore after we logged in and saved the cookies

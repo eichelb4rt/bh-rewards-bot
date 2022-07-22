@@ -23,7 +23,7 @@ export default class ErrorLog {
         this.start_session();
         const time_str = time ? ` at ${time}`: '';
         const watcher_str = watcher ? ` for ${watcher.user.name}`: '';
-        const err_str = `Following error occured${time_str}${watcher_str}:\n${err}\n`;
+        const err_str = `Following error occured${time_str}${watcher_str}:\n${err.message}\n${err.stack}\n`;
         fs.appendFileSync(this.log_filepath, err_str);
     }
 }
