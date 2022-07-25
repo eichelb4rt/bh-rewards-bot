@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { Browser, Frame } from "puppeteer";
 import Cookies from "./cookies.js";
-import ErrorLog from './errorlog.js';
 import { LoginPage } from "./login.js";
 import { Reward } from './reward.js';
 import { StreamPage } from "./stream.js";
@@ -52,6 +51,7 @@ export class Watcher {
         // inject loaded cookies
         await this.#cookies.injectInto(page);
         // go on twitch
+        page.setDefaultNavigationTimeout(0);
         await page.goto("https://www.twitch.tv/brawlhalla");
         await page.evaluate(() => {
             localStorage.setItem('mature', 'true');

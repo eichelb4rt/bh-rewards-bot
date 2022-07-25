@@ -1,6 +1,5 @@
 import puppeteer, { Browser } from "puppeteer";
 import Config from "./config.js";
-import Cookies from "./cookies.js";
 import ErrorLog from "./errorlog.js";
 import { Rewards } from "./reward.js";
 import { ONLINE_REFRESH_INTERVAL, Scheduler } from "./schedule.js";
