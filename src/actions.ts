@@ -86,7 +86,10 @@ export default class Action {
         const watchers = await this.login();
         for (const watcher of watchers) {
             try {
-                await watcher.watch();
+                // try watching stream
+                const watching = await watcher.watch();
+                if (!watching) continue;
+                // check if blocked
                 if (await watcher.isBlocked()) {
                     console.log(`Oh no! ${watcher.user.name} is blocked!`);
                     watcher.user.blocked = true;
@@ -94,6 +97,7 @@ export default class Action {
                     await watcher.stop();
                     continue;
                 }
+                // everything is fine, hide the video
                 await watcher.hideVideo();
                 ++n_watchers;
                 console.log(`${watcher.user.name} is farming.`);

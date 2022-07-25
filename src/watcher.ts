@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { Browser, Frame } from "puppeteer";
 import Cookies from "./cookies.js";
+import ErrorLog from './errorlog.js';
 import { LoginPage } from "./login.js";
 import { Reward } from './reward.js';
 import { StreamPage } from "./stream.js";
@@ -39,7 +40,8 @@ export class Watcher {
         await this.stop();
     }
 
-    async watch() {
+    // true if success, false if failed
+    async watch(): Promise<boolean> {
         // start watching the stream
         const page = await this.#browser.newPage();
         await page.setViewport({
@@ -59,14 +61,21 @@ export class Watcher {
         // see who logged in
         let new_cookies = new Cookies(await page.cookies());
         await Cookies.waitForCookies(page, 30);
-        console.log('Logged in as ' + new_cookies.login);
+        console.log(`Logged in as ${new_cookies.login}`);
         // adjust stuff
         this.#streamPage = new StreamPage(page);
-        await this.#streamPage.waitForLoad();
+        // try loading stream
+        try {
+            await this.#streamPage.waitForLoad();
+            // reload and wait until all the stuff has loaded in
+            await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
+        } catch (e) {
+            console.log(`${this.user.name}: Stream already stopped.`);
+            return false;
+        }
+        // skip email if needed
         await this.#streamPage.skipEmailVerification();
-
-        // reload and wait until all the stuff has loaded in
-        await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
+        return true;
     }
 
     async stop() {
