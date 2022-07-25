@@ -75,6 +75,7 @@ export default class Action {
      * Starts Brawlhalla streams and farms for rewards (for every user).
      */
     async farm() {
+        const scheduler = Action.#config.scheduler;
         // save the end time of the current stream
         const streamEnd = Action.#config.currentStreamEnd;
         // wait (max time) until brawlhalla is online
@@ -84,6 +85,8 @@ export default class Action {
         let n_watchers = 0;
         const watchers = await this.login();
         for (const watcher of watchers) {
+            // stop if brawl stopped streaming
+            if (!await scheduler.isStreaming()) break;
             try {
                 // try watching stream
                 const watching = await watcher.watch();
@@ -153,8 +156,11 @@ export default class Action {
     async harvest() {
         // TODO: wait (max time) until brawlhalla is offline
         Rewards.read();
+        const scheduler = Action.#config.scheduler;
         const watchers = await this.login();
         for (const watcher of watchers) {
+            // stop if brawl stopped streaming
+            if (!await scheduler.isStreaming()) break;
             try {
                 await watcher.watch();
                 // have to click before the video disappears
