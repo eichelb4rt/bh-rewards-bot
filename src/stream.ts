@@ -21,8 +21,8 @@ export class StreamPage extends TwitchPage {
      * elements are visible.
      */
     async waitForLoad() {
-        await this.page.waitForSelector('p[data-a-target="animated-channel-viewers-count"]');
-        await this.page.waitForSelector('span.live-time');
+        await this.page.waitForSelector('p[data-a-target="animated-channel-viewers-count"]', { timeout: 30 });
+        await this.page.waitForSelector('span.live-time', { timeout: 30 });
     }
 
     /**
