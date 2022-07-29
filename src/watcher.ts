@@ -57,7 +57,6 @@ export class Watcher {
 
         // go on twitch
         this.log("Going on Twitch.", "watch");
-        page.setDefaultNavigationTimeout(0);
         await page.goto("https://www.twitch.tv/brawlhalla");
         await page.evaluate(() => {
             localStorage.setItem('mature', 'true');
