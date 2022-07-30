@@ -34,10 +34,9 @@ export class Watcher {
             const loginPage = new LoginPage(await this.#browser.newPage());
             this.#cookies = await loginPage.login(this.user.name, this.user.password);
             this.#cookies.save(cookiesPath);
+            // we don't need this page anymore after we logged in and saved the cookies
+            await loginPage.page.close();
         }
-
-        // we don't need this page anymore after we logged in and saved the cookies
-        await this.stop();
     }
 
     // true if success, false if failed
