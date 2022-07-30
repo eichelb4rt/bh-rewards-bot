@@ -117,6 +117,7 @@ export default class Action {
         for (const watcher of watchers) {
             await watcher.stop();
         }
+        console.log("All watchers stopped watching.");
         DebugLog.log("All watchers stopped watching.");
     }
 

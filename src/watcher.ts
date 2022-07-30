@@ -89,7 +89,6 @@ export class Watcher {
     }
 
     async stop() {
-        this.log("Stopping.", "stop");
         if (!this.#streamPage) return;
         if (this.#streamPage.page.isClosed()) return;
         await this.#streamPage.page.close();
