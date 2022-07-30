@@ -166,7 +166,13 @@ export default class Action {
                 // have to click before the video disappears
                 await watcher.clickExtension();
                 await watcher.hideVideo();
-                await watcher.clickInventory();
+                // clicking inventory might fail
+                const success = await watcher.clickInventory();
+                if (!success) {
+                    await watcher.stop();
+                    continue;
+                }
+                // finall harvest
                 console.log(`${watcher.user.name} harvesting.`);
                 const rewards = await watcher.readInventory();
                 Rewards.save(rewards);

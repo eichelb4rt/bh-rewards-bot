@@ -3,9 +3,15 @@ import { Browser, Frame } from "puppeteer";
 import Cookies from "./cookies.js";
 import DebugLog from './debuglog.js';
 import { LoginPage } from "./login.js";
+import { frameHasText } from './page.js';
 import { Reward } from './reward.js';
+import { Scheduler } from './schedule.js';
 import { StreamPage } from "./stream.js";
 import { User } from './users.js';
+
+const MAX_EXTENSION_LOAD_TIME = 10000
+const EXTENSION_CHECK_INTERVAL = 500
+const MAX_INVENTORY_LOAD_TIME = 5000
 
 export class Watcher {
     readonly #browser: Browser;
@@ -107,14 +113,34 @@ export class Watcher {
         this.#extensionFrame = iiframe;
     }
 
-    async clickInventory() {
+    async waitForExtension(timeout: number = MAX_EXTENSION_LOAD_TIME) {
+        const start_time = (new Date()).getTime();
+        while (await frameHasText(this.#extensionFrame, "LOADING")) {
+            const now = (new Date()).getTime();
+            if (now - start_time > timeout) {
+                throw new Error("Extension didn't load in time.");
+            }
+            await Scheduler.sleep(EXTENSION_CHECK_INTERVAL);
+        }
+    }
+
+    async clickInventory(): Promise<boolean> {
         if (!this.#extensionFrame) {
             console.log("Didn't click the extension yet! Returning...");
-            return;
+            return false;
         }
+
+        this.log("Waiting for Extension.", "clickInventory");
+        await this.waitForExtension(MAX_EXTENSION_LOAD_TIME);
+        if (await frameHasText(this.#extensionFrame, "UNABLE TO CONNECT")) {
+            console.log("Unable to connect to extension.");
+            return false;
+        }
+
         this.log("Clicking Inventory Tab.", "clickInventory");
-        await this.#extensionFrame.waitForSelector("#react-tabs-2");
+        await this.#extensionFrame.waitForSelector("#react-tabs-2", { timeout: MAX_INVENTORY_LOAD_TIME });
         await this.#extensionFrame.click("#react-tabs-2");
+        return true;
     }
 
     async readInventory(): Promise<Reward[]> {

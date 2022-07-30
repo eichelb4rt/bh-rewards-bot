@@ -1,6 +1,6 @@
 "use strict";
 
-import puppeteer, { Page } from "puppeteer";
+import puppeteer, { Frame, Page } from "puppeteer";
 const TimeoutError = puppeteer.errors.TimeoutError;
 
 export abstract class TwitchPage {
@@ -37,4 +37,14 @@ export abstract class TwitchPage {
         return this.#page;
     }
 
+}
+
+export async function frameHasText(frame: Frame, text: string) {
+    try {
+        await frame.waitForXPath(`//*[contains(text(), "${text}")]`, { timeout: 1000 });
+        return true;
+    } catch (err) {
+        if (err instanceof TimeoutError) return false;
+        console.log(err);
+    }
 }

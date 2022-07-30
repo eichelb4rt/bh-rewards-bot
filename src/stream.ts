@@ -54,7 +54,7 @@ export class StreamPage extends TwitchPage {
     async getViewersCount() {
         const element = await this.page.$('p[data-a-target="animated-channel-viewers-count"]');
         const property = await element?.getProperty('innerText');
-        const value = await property?.jsonValue() as string;
+        const value: string = await property?.jsonValue();
         const cleanValue = value.replace(/[.,]/g, '');
         return parseInt(cleanValue);
     }
@@ -114,6 +114,7 @@ export class StreamPage extends TwitchPage {
         await this.page.waitForSelector("[data-a-target=player-overlay-click-handler]");
         await this.page.hover("[data-a-target=player-overlay-click-handler]");
         // click on the extension
+        await this.page.waitForSelector(".extensions-dock-card__image", { timeout: 1000 });
         await this.click(".extensions-dock-card__image");
     }
 }
