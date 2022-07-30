@@ -76,7 +76,6 @@ export class Watcher {
         this.#streamPage = new StreamPage(page);
         // try loading stream
         try {
-            await this.#streamPage.waitForLoad();
             // reload and wait until all the stuff has loaded in
             this.log("Reloading page.", "watch");
             await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
