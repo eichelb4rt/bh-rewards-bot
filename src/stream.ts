@@ -101,8 +101,12 @@ export class StreamPage extends TwitchPage {
     }
 
     async chatBanned(): Promise<boolean> {
-        const banned_text = await this.page.$("[data-test-selector=current-user-banned-text]");
-        return banned_text != null;
+        try {
+            const banned_text = await this.page.$("[data-test-selector=current-user-banned-text]");
+            return banned_text != null;
+        } catch (e) {
+            return false;
+        }
     }
 
     async clickExtension() {

@@ -88,9 +88,8 @@ export default class Action {
             // stop if brawl stopped streaming
             if (!await scheduler.isStreaming()) break;
             try {
-                // try watching stream
-                const watching = await watcher.watch();
-                if (!watching) continue;
+                // watch stream
+                await watcher.watch();
                 // check if blocked
                 if (await watcher.isBlocked()) {
                     console.log(`Oh no! ${watcher.user.name} is blocked!`);

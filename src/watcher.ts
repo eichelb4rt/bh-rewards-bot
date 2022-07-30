@@ -39,8 +39,7 @@ export class Watcher {
         }
     }
 
-    // true if success, false if failed
-    async watch(): Promise<boolean> {
+    async watch() {
         this.log("Creating new page.", "watch");
         // start watching the stream
         const page = await this.#browser.newPage();
@@ -73,19 +72,13 @@ export class Watcher {
         // adjust stuff
         this.log("Creating StreamPage.", "watch");
         this.#streamPage = new StreamPage(page);
-        // try loading stream
-        try {
-            // reload and wait until all the stuff has loaded in
-            this.log("Reloading page.", "watch");
-            await page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
-        } catch (e) {
-            console.log(`${this.user.name}: Stream already stopped.`);
-            return false;
-        }
 
         // skip email if needed
         await this.#streamPage.skipEmailVerification();
-        return true;
+    }
+
+    async reload() {
+        await this.#streamPage.page.reload({ waitUntil: ['networkidle2', 'domcontentloaded'] });
     }
 
     async stop() {
