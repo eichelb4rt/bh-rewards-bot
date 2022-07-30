@@ -36,6 +36,11 @@ export class Users {
         }
     }
 
+    static add(user: User) {
+        this.#users.push(user);
+        this.save();
+    }
+
 
     public static get users(): User[] {
         return this.#users;

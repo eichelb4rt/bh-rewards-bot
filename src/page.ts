@@ -4,7 +4,6 @@ import puppeteer, { Frame, Page } from "puppeteer";
 const TimeoutError = puppeteer.errors.TimeoutError;
 
 export abstract class TwitchPage {
-
     readonly #page: Page;
 
     constructor(page: Page) {
@@ -23,6 +22,18 @@ export abstract class TwitchPage {
         }, selector);
     }
 
+    public async clickText(text: string) {
+        const text_element = await this.#page.waitForXPath(`//*[contains(text(), "${text}")]`, { timeout: 1000 });
+        await text_element.click();
+    }
+
+    public async clearTextField() {
+        await this.#page.keyboard.down('Control');
+        await this.#page.keyboard.press('A');
+        await this.#page.keyboard.up('Control');
+        await this.#page.keyboard.press('Backspace');
+    }
+
     public async hasText(text: string) {
         try {
             await this.#page.waitForXPath(`//*[contains(text(), "${text}")]`, { timeout: 1000 });
@@ -36,7 +47,6 @@ export abstract class TwitchPage {
     get page(): Page {
         return this.#page;
     }
-
 }
 
 export async function frameHasText(frame: Frame, text: string) {

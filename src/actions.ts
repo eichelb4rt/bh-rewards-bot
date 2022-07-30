@@ -1,6 +1,8 @@
 import puppeteer, { Browser } from "puppeteer";
 import Config from "./config.js";
 import DebugLog from "./debuglog.js";
+import { EmailPage } from "./emailpage.js";
+import { RegisterPage } from "./register.js";
 import { Rewards } from "./reward.js";
 import { ONLINE_REFRESH_INTERVAL, Scheduler } from "./schedule.js";
 import { Users } from "./users.js";
@@ -122,6 +124,25 @@ export default class Action {
 
     async register() {
         // TODO: register
+        // make 10-minute-mail, read address
+        // click "Sign Up"
+        // generate & fill in username, password
+        // if "This username is unavailable.", generate new username
+        // date of birth 30 07 1999
+        // https://10minutemail.net/?lang=en
+        // click "use email instead" if it's there
+        // fill in email
+        // click "Sign Up"
+        // we're making sure you're not a bot...
+        // wait on email
+        Users.read();
+        const email_page = new EmailPage(await this.browser.newPage());
+        const register_page = new RegisterPage(await this.browser.newPage());
+        const new_user = await register_page.register(email_page);
+        console.log(new_user);
+        while (true) {
+            await Scheduler.sleep(5000);
+        }
     }
 
     /**

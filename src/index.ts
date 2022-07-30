@@ -7,6 +7,7 @@ async function main() {
 	Action.configure({scheduler: scheduler});
 	console.log(`Brawlhalla is ${await scheduler.isStreaming()? '': 'not'} streaming.`);
 	scheduler.startLoop();
+	// await Action.autoExecute();
 }
 
 main();

@@ -26,7 +26,7 @@ export class Watcher {
     }
 
     async login() {
-        let cookiesPath = `./cookies/cookies-${this.user.name}.json`;
+        const cookiesPath = `./cookies/cookies-${this.user.name}.json`;
         this.#cookies = Cookies.readFromFile(cookiesPath);
 
         // If both cookies and a username are provided and the provided username does not match the username stored in the cookies, warn the user and prefer to use the one from the cookies.
