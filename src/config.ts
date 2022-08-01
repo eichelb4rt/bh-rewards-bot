@@ -5,6 +5,7 @@ interface IConfig {
     mode: string,
     debug: boolean,
     headless: boolean,
+    once: boolean,
 }
 
 function readConfig(path: string): IConfig {
@@ -21,27 +22,32 @@ export default class Config {
         this.gotConfig = true;
     }
 
-    
-    public static get os() : string {
+
+    public static get os(): string {
         this.read();
         return this.iconf.os;
     }
 
-    public static get mode() : string {
+    public static get mode(): string {
         this.read();
         return this.iconf.mode;
     }
 
-    public static get debug() : boolean {
+    public static get debug(): boolean {
         this.read();
         return this.iconf.debug;
     }
 
-    public static get headless() : boolean {
+    public static get headless(): boolean {
         this.read();
         return this.iconf.headless;
     }
-    
+
+    public static get once(): boolean {
+        this.read();
+        return this.iconf.once;
+    }
+
     /**
      * Returns correct browser path based on selected OS.
      */

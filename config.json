@@ -1,6 +1,7 @@
 {
     "os": "linux",
-    "mode": "harvest",
+    "mode": "farm",
     "debug": false,
-    "headless": true
+    "headless": true,
+    "once": true
 }
