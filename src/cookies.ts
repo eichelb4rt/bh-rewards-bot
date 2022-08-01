@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { Page } from "puppeteer";
+import DebugLog from './debuglog.js';
 
 export default class Cookies {
     static readonly #requiredCookies = new Set(["auth-token", "persistent", "login"]);
@@ -75,7 +76,7 @@ export default class Cookies {
             const _cookies = await page.cookies();
             if (this.#allCookiesExist(_cookies)) break;
 
-            console.log("Waiting for cookies to be created...");
+            DebugLog.log("Waiting for cookies to be created...");
             await page.waitForTimeout(3000);
         }
     }
