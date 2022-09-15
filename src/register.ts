@@ -84,6 +84,31 @@ export class RegisterPage extends TwitchPage {
         return this.#created_user;
     }
 
+    async grantPermissions() {
+        // go to stream
+        await this.page.goto("https://www.twitch.tv/brawlhalla/");
+        // click extension
+        await this.clickExtension();
+        const iframe = await (await this.page.$("iframe.extension-view__iframe")).contentFrame();
+        const iiframe = await (await iframe.$("iframe")).contentFrame();
+        const extension_frame = iiframe;
+        await extension_frame.click(".online-button");
+        await this.clickFrameText(extension_frame, "Grant");
+    }
+
+    private async clickExtension() {
+        // hover over the video so the extension is shown
+        await this.page.waitForSelector("[data-a-target=player-overlay-click-handler]");
+        await this.page.hover("[data-a-target=player-overlay-click-handler]");
+        // click on the extension
+        await this.page.waitForSelector(".extensions-dock-card__image", { timeout: 1000 });
+        await this.click(".extensions-dock-card__image");
+    }
+
+    async close() {
+        await this.page.close();
+    }
+
     public async saveCookies() {
         await Cookies.waitForCookies(this.page, 0);
         const cookies = new Cookies(await this.page.cookies());
@@ -104,11 +129,11 @@ export class RegisterPage extends TwitchPage {
 
     private static genUsername() {
         // TODO
-        return "hardy_hater_3000";
+        return "bruh_habruhter_3000";
     }
 
     private static genPassword() {
         // TODO
-        return "dn5s7a9k0j2d21n4i54u7ewqi";
+        return "1n4i54u7ewqidn5s7a9k0j2d2";
     }
 }

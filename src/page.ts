@@ -27,6 +27,11 @@ export abstract class TwitchPage {
         await text_element.click();
     }
 
+    public async clickFrameText(frame: Frame, text: string) {
+        const text_element = await frame.waitForXPath(`//*[contains(text(), "${text}")]`, { timeout: 1000 });
+        await text_element.click();
+    }
+
     public async clearTextField() {
         await this.#page.keyboard.down('Control');
         await this.#page.keyboard.press('A');
