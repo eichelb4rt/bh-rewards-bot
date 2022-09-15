@@ -1,0 +1,20 @@
+[
+    {
+        "name": "account1",
+        "password": "password1",
+        "registered": true,
+        "blocked": false
+    },
+    {
+        "name": "account2",
+        "password": "password2",
+        "registered": true,
+        "blocked": false
+    },
+    {
+        "name": "account3",
+        "password": "password3",
+        "registered": true,
+        "blocked": false
+    }
+]
