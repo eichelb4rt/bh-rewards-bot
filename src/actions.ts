@@ -202,7 +202,7 @@ export default class Action {
         const startWait = Date.now();
         while (!await scheduler.isStreaming()) {
             console.log(`${new Date()}: waiting until stream starts.`);
-            Scheduler.sleep(ONLINE_REFRESH_INTERVAL);
+            await Scheduler.sleep(ONLINE_REFRESH_INTERVAL);
             if (Date.now() - startWait > MAX_WAITING_TIME) {
                 console.log(`${new Date()}: waiting failed because stream didn't start.`);
                 return false;
