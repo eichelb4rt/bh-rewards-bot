@@ -2,6 +2,10 @@
 
 farms twitch rewards from brawlhalla dev streams
 
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+
 ## Installation
 
 install chrome
@@ -31,10 +35,6 @@ If you're having problems with screen, like `Cannot make directory '/run/screen:
 sudo /etc/init.d/screen-cleanup start
 ```
 
-## Usage
-
-Run `bash start.sh`. This starts a screen session called `bh_rewards`. If you don't want a screen session, just run `npm run start`.
-
 ## Configuration
 
 `config.json`:
@@ -49,8 +49,8 @@ Run `bash start.sh`. This starts a screen session called `bh_rewards`. If you do
 }
 ```
 
-headless: if the browser is headless. (default: true)
-once: if the bots should only start once. (default: false)
+- headless: if the browser is headless. (default: true)
+- once: if the bots should only start once. (default: false)
 
 ---
 
@@ -90,7 +90,11 @@ This is your Twitch API key that is used to read Brawlhalla's schedule.
 ]
 ```
 
-registered: if the account is registered yet / has granted permissions to the extensions yet. (default: true)
-blocked: if the account is blocked by Brawlhalla and therefore cannot farm rewards. (default: false)
+- registered: if the account is registered yet / has granted permissions to the extensions yet. (default: true)
+- blocked: if the account is blocked by Brawlhalla and therefore cannot farm rewards. (default: false)
 
 An account won't be used if it's either not registered or blocked.
+
+## Usage
+
+Run `bash start.sh`. This starts a screen session called `bh_rewards`. If you don't want a screen session, just run `npm run start`.
