@@ -2,6 +2,35 @@
 
 farms twitch rewards from brawlhalla dev streams
 
+## Installation
+
+install dependencies for puppeteer
+
+```text
+sudo apt-get install libnss3 libxss1 libasound2 libatk-bridge2.0-0 libgtk-3-0 libgbm-dev
+```
+
+install node modules
+
+```text
+npm i
+```
+
+install chrome
+
+```text
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+```
+
+### Screen Problems?
+
+If you're having problems with screen, like `Cannot make directory '/run/screen: Permission denied'`, then run this:
+
+```text
+sudo /etc/init.d/screen-cleanup start
+```
+
 ## Usage
 
 To start the bot, just install all the dependencies (`npm i`) and run `bash start.sh`. This starts a screen session called `bh_rewards`.
