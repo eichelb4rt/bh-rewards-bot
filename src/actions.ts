@@ -113,7 +113,9 @@ export default class Action {
         console.log(`${n_watchers} watchers are farming.`);
         // wait until the end of stream and brawlhalla is offline
         if (streamEnd) await Scheduler.sleepUntil(streamEnd.getTime());
+        DebugLog.log("Stream officially ended, waiting until offline.");
         await Action.waitUntilOffline();
+        DebugLog.log("Stream offline.");
         // close pages
         for (const watcher of watchers) {
             await watcher.stop();
@@ -213,7 +215,7 @@ export default class Action {
 
     private static async waitUntilOffline() {
         const scheduler = this.#config.scheduler;
-        while (!await scheduler.isStreaming()) {
+        while (await scheduler.isStreaming()) {
             await Scheduler.sleep(ONLINE_REFRESH_INTERVAL);
         }
     }
