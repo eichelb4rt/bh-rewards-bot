@@ -16,13 +16,11 @@ export class Rewards {
     static fileChecked = false;
 
     static read() {
-        if (!fs.existsSync(this.#jsonPath)) {
+        if (fs.existsSync(this.#jsonPath)) {
+            this.#savedRewards = JSON.parse(fs.readFileSync(this.#jsonPath, 'utf-8'));
+        } else {
             this.#savedRewards = [];
-            this.fileChecked = true;
-            return;
         }
-
-        this.#savedRewards = JSON.parse(fs.readFileSync(this.#jsonPath, 'utf-8'));
         this.#savedCodes = new Set(this.#savedRewards.map(reward => reward.code));
         this.fileChecked = true;
     }
