@@ -62,7 +62,7 @@ class Rewards:
         self.dict = to_dict(rewards)
         self.counted = count_rewards(rewards)
         self.codes = [reward.code for reward in self.list]
-        self.reward_names: list[str] = list(self.counted.keys())
+        self.reward_names: list[str] = sorted(list(self.counted.keys()))
         self.id_to_name: dict[int, str] = {i: name for i, name in enumerate(self.reward_names)}
 
     def claim(self, code: str):
