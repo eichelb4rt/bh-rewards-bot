@@ -11,11 +11,15 @@ export default class Auth {
 
     private async generateNewToken() {
         const response = await fetch(`https://id.twitch.tv/oauth2/token?client_id=${this.clientId}&client_secret=${this.clientSecret}&grant_type=client_credentials`, { method: "POST" });
-        return JSON.parse(await response.text());
+        const response_body = JSON.parse(await response.text());
+        if (response.status === 400) {
+            throw Error(`Something went wrong during authentication: ${response_body.message}.`)
+        }
+        return response_body.access_token;
     }
 
     async getToken() {
         // this could be done fancy with expiry stuff, but i don't give a shit anymore. this stuff is exhausting.
-        return (await this.generateNewToken()).access_token;
+        return await this.generateNewToken();
     }
 }
