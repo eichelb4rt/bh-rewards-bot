@@ -7,7 +7,7 @@
   "dependencies": {
     "@types/node-fetch": "^2.6.1",
     "dotenv": "^16.0.1",
-    "node-fetch": "^3.2.4",
+    "node-fetch": "^3.2.10",
     "puppeteer": "^24.6.1",
     "typescript": "^4.6.3"
   },
